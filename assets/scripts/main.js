@@ -25,6 +25,7 @@ const router = new Router(function () {
    * This will only be two single lines
    * If you did this right, you should see just 1 recipe card rendered to the screen
    */
+   console.log('here');
    document.querySelector('.section--recipe-cards').classList.add('shown');
    document.querySelector('.section--recipe-expand').classList.remove('shown');
 });
@@ -90,8 +91,8 @@ async function fetchRecipes() {
  * appends them to the page
  */
 function createRecipeCards() {
-  var i = 0;
-  for(i = 0; i < Object.keys(recipeData).length; i++) {
+  var map1 = new Map();
+  for(var i = 0; i < Object.keys(recipeData).length; i++) {
     // Makes a new recipe card
     const recipeCard = document.createElement('recipe-card');
     if(i > 2) {
@@ -107,11 +108,14 @@ function createRecipeCards() {
     // for that ghostCookies URL since it's a key in the recipeData object, and
     // then we'll grab the 'page-name' from it - in this case it will be 'ghostCookies'
     const page = recipeData[recipes[i]]['page-name'];
+    map1.set(page, i);
+    // console.log(i);
     router.addPage(page, function() {
       document.querySelector('.section--recipe-cards').classList.remove('shown');
       document.querySelector('.section--recipe-expand').classList.add('shown');
-      document.querySelector('recipe-expand').data = recipeData[recipes[i]];
+      document.querySelector('recipe-expand').data = recipeData[recipes[map1.get(page)]];
     });
+
     bindRecipeCard(recipeCard, page);
 
     document.querySelector('.recipe-cards--wrapper').appendChild(recipeCard);
@@ -183,8 +187,9 @@ function bindEscKey() {
    * page. This will let us go back to the home page from the detailed page.
    */
   document.addEventListener("keydown", e => {
-    if(e === 'esc') {
-      router.navigate(home);
+    console.log(e);
+    if(e.key === 'Escape') {
+      router.navigate('home');
     }
   });
 }
@@ -209,6 +214,12 @@ function bindPopstate() {
    * creating an infinite loop
    */
   window.addEventListener('popstate', e => {
-    router.navigate(e, true);
+    console.log(e);
+    if(e.state) {
+      router.navigate(e.state.page, true);
+    }
+    else {
+      router.navigate('home', true);
+    }
   });
 }
